@@ -1,4 +1,4 @@
-package yelp.data;
+package yelp.data.business;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -86,8 +86,12 @@ public class Dataset {
 			
 		}
 
+		boolean flag = false;
 		try {
-			dfs.rename(tmpPath, newPath);
+			if(dfs.exists(newPath)) {
+				dfs.delete(newPath, true);
+			}
+			flag = dfs.rename(tmpPath, newPath);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

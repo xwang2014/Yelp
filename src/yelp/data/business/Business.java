@@ -1,4 +1,4 @@
-package yelp.data;
+package yelp.data.business;
 
 import java.io.DataInput;
 import java.io.DataOutput;
