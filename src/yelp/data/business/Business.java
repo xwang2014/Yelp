@@ -71,9 +71,9 @@ public class Business implements Writable {
 		bus.fullAddress = (String) obj.get("full_address");
 		bus.city = (String) obj.get("city");
 		bus.state = (String) obj.get("state");
-		bus.latitude = (double) obj.get("latitude");
-		bus.longitude = (double) obj.get("longitude");
-		bus.reviewCount = (long) obj.get("review_count");
+		bus.latitude = (Double) obj.get("latitude");
+		bus.longitude = (Double) obj.get("longitude");
+		bus.reviewCount = (Long) obj.get("review_count");
 		
 		return bus;
 	}

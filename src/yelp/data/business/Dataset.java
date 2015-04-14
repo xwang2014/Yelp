@@ -77,7 +77,7 @@ public class Dataset {
 		} finally {
 			try {
 				br.close();
-				writer.hflush();
+				//writer.hflush();
 				writer.close();
 				
 			} catch (IOException e) {

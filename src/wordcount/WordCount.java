@@ -56,7 +56,8 @@ public class WordCount {
 		
 		Configuration conf = new Configuration();
 	        
-		Job job = Job.getInstance(conf, "WordCount_" + System.currentTimeMillis());
+		Job job = new Job(conf);
+		job.setJobName("WordCount_" + System.currentTimeMillis());
 	    
 	    job.setMapperClass(WordCountMapper.class);
 	    job.setReducerClass(WordCountReducer.class);

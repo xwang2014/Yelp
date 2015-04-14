@@ -46,7 +46,8 @@ public class BusinessDataDriver {
 	public void execute() throws IOException {
 		this.conf = new Configuration();
 		
-		Job job = Job.getInstance(conf, "Yelp Business Data Init");
+		Job job = new Job(conf); 
+		job.setJobName("Yelp Business Data Init");
 		//job.setJarByClass(getClass());
 		job.setJarByClass(BusinessDataDriver.class);
 		
@@ -58,7 +59,7 @@ public class BusinessDataDriver {
 		job.setOutputKeyClass(NullWritable.class);
 		job.setOutputValueClass(Business.class);
 		
-		String input = "/data/yelp/raw/business/";
+		String input = "/yelp/raw/business/";
 		String output = "/data/yelp/business/";
 		FileSystem fs = FileSystem.get(conf);
 		if(fs.exists(new Path(output))) {
@@ -76,7 +77,9 @@ public class BusinessDataDriver {
 		boolean flag = false;
 		try {
 			flag = job.waitForCompletion(true);
-		} catch (ClassNotFoundException | InterruptedException e) {
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 		

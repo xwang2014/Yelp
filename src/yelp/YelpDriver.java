@@ -54,7 +54,8 @@ public class YelpDriver {
 		}
 		
 		Configuration conf = new Configuration();
-		Job job = Job.getInstance(conf, "YelpReviewCount_" + ts);
+		Job job = new Job(conf);
+		job.setJobName( "YelpReviewCount_" + ts);
 		
 		job.setJarByClass(ViewCountMapper.class);
 		
@@ -105,7 +106,8 @@ public class YelpDriver {
 		Configuration conf = new Configuration();
 		//conf.set("mapred.map.child.log.level", "DEBUG");
 		
-		Job job = Job.getInstance(conf, "YelpViewCountSort_" + ts);
+		Job job = new Job(conf); 
+		job.setJobName("YelpViewCountSort_" + ts);
 		
 		job.setMapperClass(ViewCountSortMapper.class);
 		job.setReducerClass(ViewCountSortReducer.class);
