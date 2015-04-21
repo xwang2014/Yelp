@@ -17,11 +17,12 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import yelp.YelpCommon;
+
 public class ReviewDataDriver {
 	
-	private static final int partitionNum = 10;
 	
-	public static class ReviewDataMapper extends Mapper<LongWritable, Text, LongWritable, Review> {
+	public static class ReviewDataMapper extends Mapper<LongWritable, Text, Text, Review> {
 
 		@Override
 		protected void map(LongWritable key, Text value, Context context)
@@ -36,17 +37,17 @@ public class ReviewDataDriver {
 			}
 			
 			Review review = Review.readFromJson(obj);
-			long shuffleKey = review.businessId.hashCode() % partitionNum;
+			Text shuffleKey = new Text(review.businessId);
 			
-			context.write(new LongWritable(shuffleKey), review);
+			context.write(shuffleKey, review);
 		}
 		
 	}
 	
-	public static class ReviewDataReducer extends Reducer<LongWritable, Review, NullWritable, Review> {
+	public static class ReviewDataReducer extends Reducer<Text, Review, NullWritable, Review> {
 
 		@Override
-		protected void reduce(LongWritable arg0, Iterable<Review> arg1,
+		protected void reduce(Text arg0, Iterable<Review> arg1,
 				Context arg2)
 				throws IOException, InterruptedException {
 			for(Review r : arg1) {
@@ -64,7 +65,7 @@ public class ReviewDataDriver {
 		job.setJarByClass(ReviewDataDriver.class);
 		
 		job.setMapperClass(ReviewDataMapper.class);
-		job.setMapOutputKeyClass(LongWritable.class);
+		job.setMapOutputKeyClass(Text.class);
 		job.setMapOutputValueClass(Review.class);
 		
 		job.setReducerClass(ReviewDataReducer.class);
@@ -85,7 +86,7 @@ public class ReviewDataDriver {
 		job.setOutputFormatClass(SequenceFileOutputFormat.class);
 		SequenceFileOutputFormat.setOutputPath(job, output);
 		
-		job.setNumReduceTasks(partitionNum);
+		job.setNumReduceTasks(YelpCommon.partitionNum);
 		
 		boolean flag = false;
 		flag = job.waitForCompletion(true);

@@ -21,6 +21,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import yelp.YelpCommon;
+
 /**
  * This class handles the yelp business source data
  * @author xin
@@ -30,7 +32,7 @@ public class BusinessDataDriver {
 	
 	Configuration conf = null;
 	
-	public static final int partitionNum = 10;
+	
 	
 	public static void main(String[] args) {
 		BusinessDataDriver driver = new BusinessDataDriver();
@@ -52,7 +54,7 @@ public class BusinessDataDriver {
 		job.setJarByClass(BusinessDataDriver.class);
 		
 		job.setMapperClass(BusinessDataMapper.class);
-		job.setMapOutputKeyClass(LongWritable.class);
+		job.setMapOutputKeyClass(Text.class);
 		job.setMapOutputValueClass(Business.class);
 		
 		job.setReducerClass(BusinessDataReducer.class);
@@ -72,7 +74,7 @@ public class BusinessDataDriver {
 		job.setOutputFormatClass(SequenceFileOutputFormat.class);
 		SequenceFileOutputFormat.setOutputPath(job, new Path(output));
 		
-		job.setNumReduceTasks(partitionNum);
+		job.setNumReduceTasks(YelpCommon.partitionNum);
 		
 		boolean flag = false;
 		try {
@@ -86,7 +88,7 @@ public class BusinessDataDriver {
 		System.out.println("Job result : " + flag);
 	}
 	
-	static class BusinessDataMapper extends Mapper<LongWritable, Text, LongWritable, Business> {
+	static class BusinessDataMapper extends Mapper<LongWritable, Text, Text, Business> {
 
 		
 		
@@ -100,10 +102,9 @@ public class BusinessDataDriver {
 				JSONObject obj = (JSONObject) parser.parse(value.toString());
 				Business business = Business.readFromJson(obj);
 				
-				long shuffleKey = business.businessId.hashCode() % partitionNum;
+				Text shuffleKey = new Text(business.businessId);
 				
-				LongWritable outputKey = new LongWritable(shuffleKey);
-				context.write(outputKey, business);
+				context.write(shuffleKey, business);
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
@@ -114,26 +115,11 @@ public class BusinessDataDriver {
 		
 	}
 
-	static class BusinessDataReducer extends Reducer<LongWritable, Business, NullWritable, Business> {
+	static class BusinessDataReducer extends Reducer<Text, Business, NullWritable, Business> {
 
-//		MultipleOutputs<NullWritable, Business> mos = null;
-//		
-//		@Override
-//		protected void setup(Context context)
-//				throws IOException, InterruptedException {
-//			mos = new MultipleOutputs<NullWritable, Business>(context);
-//		}
-//		
-//		
-//		@Override
-//		protected void cleanup(
-//				Context context)
-//				throws IOException, InterruptedException {
-//			mos.close();
-//		}
 
 		@Override
-		protected void reduce(LongWritable arg0, Iterable<Business> arg1,
+		protected void reduce(Text arg0, Iterable<Business> arg1,
 				Context arg2)
 				throws IOException, InterruptedException {
 			
